@@ -1,14 +1,16 @@
 CC = gcc
-CFLAGS = -Wall -g
+CPPFLAGS = -I../include
+CFLAGS = -Wall -g -D__NDEBUG__
 SRCS = $(wildcard *.c)
-TARGETS = $(patsubst %.c, %, $(SRCS))
+OBJS = $(patsubst %.c, %.o, $(SRCS))
 
-all : $(TARGETS)
+dict : $(OBJS)
+	$(CC) $^ -o $@
 
-$(TARGETS) : % : %.c
-	$(CC) $(CFLAGS) $< -o $@
+%.o : %.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $<
 
 clean:
-	$(RM) $(TARGETS) temp.txt
+	$(RM) $(OBJS) temp.txt dict *~
 
 .PHONY : clean all
