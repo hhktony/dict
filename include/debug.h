@@ -6,7 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#ifdef __NODEBUG__
+#ifdef __NDEBUG__
 #define IDEBUG(M, ...)
 #else
 #define IDEBUG(M, ...) \

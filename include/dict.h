@@ -22,9 +22,14 @@
 #define DICT_FILENAME "../test/dict.txt"
 #define WORD_LEN 128
 #define EXPLAIN_LEN 1024
+#define PREFIX_LEN 6 // strlen("Trans:");
+
+#define SEARCH_WORD 1
+#define ADD_WORD    2
+#define EXIT_DICT   3
 
 typedef struct node {
-	char word[64];
+	char word[WORD_LEN];
 	long pos;
 	struct node *pnext;
 } node_t, *pnode_t;

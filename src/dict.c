@@ -14,8 +14,9 @@ int menu()
 
 void print_explain(char *explain)
 {
-	explain += 6;
+	explain += PREFIX_LEN;
 	char buf[EXPLAIN_LEN];
+
 	strcpy(buf, explain);
 	explain = buf;
 	explain = strtok(explain, "@");
@@ -30,9 +31,10 @@ void print_explain(char *explain)
 
 void get_explanation(pnode_t p)
 {
-	char buffer[1024];
-	FILE *fp = fopen(DICT_FILENAME, "r+");
-	if (fp == NULL)
+	char buffer[EXPLAIN_LEN];
+	FILE *fp;
+    
+    if (( fp = fopen(DICT_FILENAME, "r+")) == NULL)
 		IERROR("Open '%s'failed!", DICT_FILENAME);
 
 	fseek(fp, p->pos, SEEK_SET);
@@ -71,9 +73,9 @@ void print_similar(pnode_t p, char *word)
 
 			if (i++ % 15 == 0)
 			{
-				puts("press enter to continue...(press '3' to exit)");
+				fprintf(stdout, "press enter to continue...(press '%d' to exit)", EXIT_DICT);
 				fgets(buffer, 31, stdin);
-				if (atoi(buffer) == 3)
+				if (atoi(buffer) == EXIT_DICT)
 					break;
 			}
 		}
@@ -87,11 +89,11 @@ void search_for_word(pnode_t phead)
 
 	while (1)
 	{
-		printf("enter the word:(enter '3' to exit)\n");
+		fprintf(stdout, "enter the word:(enter '%d' to exit)\n", EXIT_DICT);
 		fgets(word, WORD_LEN - 1, stdin);
-        if (atoi(word) == 3)
+        if (atoi(word) == EXIT_DICT)
 		    break;  
-		if (search(phead, word))
+		if (search(phead, word) < 0)
 			print_similar(phead, word);
 	}
 }
@@ -105,6 +107,18 @@ void print_link(pnode_t p)
 		p = p->pnext;
 		if ((i++) % 1000 == 0)
 			getchar();
+	}
+}
+
+void free_link(pnode_t p)
+{
+    pnode_t q = NULL;
+
+	while (p != NULL)
+	{
+        q = p->pnext;
+        free(p);
+		p = q;
 	}
 }
 
@@ -159,23 +173,24 @@ pnode_t create_link(void)
 
 bool get_info(char *word, char *explain)
 {
-	char ex_buf[1024];
+	char ex_buf[EXPLAIN_LEN];
 	word[0] = '#';
+
 	strcpy(explain, "Trans:");
 
-	puts("please input word('3' to exit): ");
+	fprintf(stdout, "please input word('%d' to exit): ", EXIT_DICT);
 	fgets(word + 1, WORD_LEN, stdin);
 
-    if (atoi(word+1) == 3)
+    if (atoi(word+1) == EXIT_DICT)
         return false;
 
 	int i = 1;
 	while (1)
 	{
-		printf("input explanation %d(input '3' to exit)\n", i++);
+		fprintf(stdout, "input explanation %d(input '%d' to exit)\n", i++, EXIT_DICT);
 		fgets(ex_buf, EXPLAIN_LEN, stdin);
 
-		if (atoi(ex_buf) == 3)
+		if (atoi(ex_buf) == EXIT_DICT)
 			break;
 
 		if (i > 2)
@@ -218,12 +233,12 @@ void move_info(long pos, char *word, char *explain)
     pid_t pid;
     char tempfile[32];
 	FILE *fp;
+	int c;
     
     if ((fp = fopen(DICT_FILENAME, "r+")) == NULL)
 		IERROR("Open file '%s' failed!", DICT_FILENAME);
 
 	fseek(fp, pos, SEEK_SET);
-	char c;
 	while ((c = getc(fp)) != EOF)
 		if (c == '#')
 			break;
@@ -306,21 +321,25 @@ int main(int argc, char *argv[])
 
 	phead = create_link();
 
-#ifndef __NODEBUG__
+#ifndef __NDEBUG__
 	print_link(phead);
 #endif
 
 	while (1)
 	{
+#ifdef __NDEBUG__
         system("clear");
+#endif
 		choice = menu();
-		if (choice == 1)
+		if (choice == SEARCH_WORD)
 			search_for_word(phead);
-		else if (choice == 2)
+		else if (choice == ADD_WORD)
 			phead = add_word(phead);
-		else if (choice == 3)
+		else if (choice == EXIT_DICT)
 			break;
 	}
+
+	free_link(phead);
 
 	return 0;
 }
