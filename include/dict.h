@@ -9,11 +9,14 @@
 #ifndef DICT_H_RRPXZCTU
 #define DICT_H_RRPXZCTU
 
-#include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include <stdbool.h>
 
+#include "xdefine.h"
 #include "debug.h"
 
 #define DICT_FILENAME "../test/dict.txt"

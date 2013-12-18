@@ -1,6 +1,6 @@
 CC = gcc
 CPPFLAGS = -I../include
-CFLAGS = -Wall -g -D__NDEBUG__
+CFLAGS = -Wall -g -D__NODEBUG__
 SRCS = $(wildcard *.c)
 OBJS = $(patsubst %.c, %.o, $(SRCS))
 
